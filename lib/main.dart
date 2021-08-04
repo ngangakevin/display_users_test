@@ -2,18 +2,7 @@ import 'dart:convert';
 import 'dart:core';
 import 'package:flutter/material.dart';
 import  'package:http/http.dart' as http;
-
 import 'dtos.dart';
-
-Future<User> fetchUsers() async {
-  final response = await http.get(
-      Uri.parse('https://jsonplaceholder.typicode.com/users'));
-  if (response.statusCode ==200){
-    return User.fromJson(jsonDecode(response.body[1]));
-  } else {
-    throw Exception('Failed to load users');
-  }
-}
 
 void main() {
   runApp(MyApp());
@@ -61,68 +50,76 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  late Future<User> futureUser;
+  List<User> users= [];
+  var loading = false;
 
-  void _nextUser(){
+  Future<Null> fetchUsers() async{
+    setState(() {
+      loading = true;
+    });
+
+    final response = await http.get(
+        Uri.parse('https://jsonplaceholder.typicode.com/users'));
+
+    if(response.statusCode == 200){
+      final data = jsonDecode(response.body);
+      setState(() {
+        for(Map i in data) {
+          users.add(User.fromJson(i));
+        }
+        loading = false;
+      });
+    }
+  }
+  void _nextUser() {
     setState(() {
       fetchUsers();
     });
   }
+
   @override
   void initState() {
     super.initState();
-    futureUser = fetchUsers();
+    fetchUsers();
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: Text('My Users'),
+        centerTitle: true,
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$futureUser',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
-        ),
+      body: Container(
+        child: loading? Center(
+            child: CircularProgressIndicator()): ListView.builder(
+            itemCount: users.length,
+            itemBuilder: (context, i){
+              final nDataList = users[i];
+              return Container(
+                child: InkWell(
+                  child: Card(
+                    color: Colors.blueGrey[100],
+                    margin: EdgeInsets.all(15),
+                    child: Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(nDataList.name, style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                            color: Colors.black),
+                          ),
+                        ],
+                      )
+                    ),
+                  ),
+
+                ),
+              );
+            }),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _nextUser,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
