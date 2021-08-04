@@ -1,12 +1,11 @@
 import 'dart:core';
-import 'dart:core';
-
 import 'package:flutter/material.dart';
 import  'package:http/http.dart' as http;
 
 Future<http.Response> fetchUsers(){
   return http.get(Uri.parse('https://jsonplaceholder.typicode.com/users'));
 }
+
 
 void main() {
   runApp(MyApp());
