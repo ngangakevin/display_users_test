@@ -1,9 +1,18 @@
+import 'dart:convert';
 import 'dart:core';
 import 'package:flutter/material.dart';
 import  'package:http/http.dart' as http;
 
-Future<http.Response> fetchUsers(){
-  return http.get(Uri.parse('https://jsonplaceholder.typicode.com/users'));
+import 'dtos.dart';
+
+Future<User> fetchUsers() async {
+  final response = await http.get(
+      Uri.parse('https://jsonplaceholder.typicode.com/users'));
+  if (response.statusCode ==200){
+    return User.fromJson(jsonDecode(response.body[1]));
+  } else {
+    throw Exception('Failed to load users');
+  }
 }
 
 void main() {
@@ -52,17 +61,17 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  late Future<User> futureUser;
 
-  void _incrementCounter() {
+  void _nextUser(){
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      fetchUsers();
     });
+  }
+  @override
+  void initState() {
+    super.initState();
+    futureUser = fetchUsers();
   }
 
   @override
@@ -103,14 +112,14 @@ class _MyHomePageState extends State<MyHomePage> {
               'You have pushed the button this many times:',
             ),
             Text(
-              '$_counter',
+              '$futureUser',
               style: Theme.of(context).textTheme.headline4,
             ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: _nextUser,
         tooltip: 'Increment',
         child: Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
