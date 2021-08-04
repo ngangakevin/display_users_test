@@ -6,7 +6,6 @@ Future<http.Response> fetchUsers(){
   return http.get(Uri.parse('https://jsonplaceholder.typicode.com/users'));
 }
 
-
 void main() {
   runApp(MyApp());
 }
