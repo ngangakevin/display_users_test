@@ -71,11 +71,11 @@ class _MyHomePageState extends State<MyHomePage> {
       });
     }
   }
-  void _nextUser() {
-    setState(() {
-      fetchUsers();
-    });
-  }
+  // void _nextUser() {
+  //   setState(() {
+  //     fetchUsers();
+  //   });
+  // }
 
   @override
   void initState() {
@@ -93,7 +93,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Container(
         child: loading? Center(
             child: CircularProgressIndicator()): ListView.builder(
-            itemCount: users.length,
+            itemCount: 5,
             itemBuilder: (context, i){
               final nDataList = users[i];
               return Container(
@@ -104,7 +104,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: Padding(
                       padding: EdgeInsets.all(16),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
                           Text(nDataList.name, style: TextStyle(
                             fontWeight: FontWeight.bold,
